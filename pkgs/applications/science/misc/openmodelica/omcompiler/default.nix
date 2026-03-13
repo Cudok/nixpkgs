@@ -2,83 +2,27 @@
   stdenv,
   lib,
   gfortran,
-  flex,
-  bison,
-  jre8,
-  blas,
-  lapack,
-  curl,
-  readline,
-  expat,
-  pkg-config,
-  buildPackages,
-  targetPackages,
-  libffi,
-  binutils,
-  mkOpenModelicaDerivation,
 }:
+# pkg:
 let
-  isCross = stdenv.buildPlatform != stdenv.hostPlatform;
-  nativeOMCompiler = buildPackages.openmodelica.omcompiler;
+  test_a = "test_a";
 in
-mkOpenModelicaDerivation (
-  {
-    pname = "omcompiler";
-    omtarget = "omc";
-    omdir = "OMCompiler";
-    omdeps = [ ];
-    omautoconf = true;
 
-    nativeBuildInputs = [
-      jre8
-      gfortran
-      flex
-      bison
-      pkg-config
-    ]
-    ++ lib.optional isCross nativeOMCompiler;
+stdenv.mkDerivation {
+  name = "mkOpenDerivation";
+  src = ./.;
 
-    buildInputs = [
-      targetPackages.stdenv.cc.cc
-      blas
-      lapack
-      curl
-      readline
-      expat
-      libffi
-      binutils
-    ];
-
-    postPatch = ''
-      sed -i -e '/^\s*AR=ar$/ s/ar/${stdenv.cc.targetPrefix}ar/
-                 /^\s*ar / s/ar /${stdenv.cc.targetPrefix}ar /
-                 /^\s*ranlib/ s/ranlib /${stdenv.cc.targetPrefix}ranlib /' \
-          $(find ./OMCompiler -name 'Makefile*')
-    '';
-
-    env.CFLAGS = toString [
-      "-Wno-error=dynamic-exception-spec"
-      "-Wno-error=implicit-function-declaration"
-    ];
-
-    preFixup = ''
-      for entry in $(find $out -name libipopt.so); do
-        patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$entry"
-        patchelf --set-rpath '$ORIGIN':"$(patchelf --print-rpath $entry)" "$entry"
-      done
-    '';
-
-    meta = {
-      description = "Modelica compiler from OpenModelica suite";
-      homepage = "https://openmodelica.org";
-      license = lib.licenses.gpl3Only;
-      maintainers = with lib.maintainers; [
-        balodja
-      ];
-      platforms = lib.platforms.linux;
-    };
-  }
-  // lib.optionalAttrs isCross {
-    configureFlags = [ "--with-omc=${nativeOMCompiler}/bin/omc" ];
-  }
-)
+  # buildInputs = [
+  #   pkgs.ffmpeg
+  # ];
+  # # only for the build process
+  # nativeBuildInputs = [
+  #   pkgs.pkgs.config
+  # ];
+  # unpackPhase = '' # shell logic '';
+  buildPhase = ''
+    echo 'hello worllld' > $out
+  '';
+  # installPhase = '' # shell logic '';
+  # ...
+}
