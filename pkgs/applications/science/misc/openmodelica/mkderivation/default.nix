@@ -14,7 +14,9 @@ stdenv.mkDerivation (
   pkg
   // {
     name = pkg.pname;
-    src = ./.;
+    # to change the version (source code) of openmodelica adpat src-main.nix
+    src = fetchgit (import ./src-main.nix);
+    version = "1.26.3";
 
     # buildInputs = [
     #   pkgs.ffmpeg
