@@ -6,11 +6,12 @@
   lib,
   fetchgit
 }:
+pkg:
 let
-  pkgs = import <nixpkgs> {};
+  test = "test";
 in
 stdenv.mkDerivation {
-  name = "mkOpenDerivation";
+  name = pkg.pname;
   src = ./.;
 
   # buildInputs = [
