@@ -18,18 +18,5 @@ stdenv.mkDerivation (
     src = fetchgit (import ./src-main.nix);
     version = "1.26.3";
 
-    # buildInputs = [
-    #   pkgs.ffmpeg
-    # ];
-    # # only for the build process
-    # nativeBuildInputs = [
-    #   pkgs.pkgs.config
-    # ];
-    # unpackPhase = '' # shell logic '';
-    buildPhase = ''
-      echo 'hello worllld' > $out
-    '';
-    # installPhase = '' # shell logic '';
-    # ...
   }
 )
