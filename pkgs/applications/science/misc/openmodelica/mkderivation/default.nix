@@ -8,7 +8,13 @@
 }:
 pkg:
 let
-  test = "test";
+  inherit (builtins)
+    hasAttr
+    getAttr
+    length
+    elemAt
+    ;
+  inherit (lib) attrByPath concatStringsSep;
 in
 stdenv.mkDerivation (
   pkg
