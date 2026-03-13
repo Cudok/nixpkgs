@@ -27,7 +27,9 @@ mkOpenModelicaDerivation (
   {
     pname = "omcompiler";
     omtarget = "omc";
-    src = ./.;
+    omdir = "OMCompiler";
+    omdeps = [ ];
+    omautoconf = true;
 
     nativeBuildInputs = [
       jre8
