@@ -10,21 +10,24 @@ pkg:
 let
   test = "test";
 in
-stdenv.mkDerivation {
-  name = pkg.pname;
-  src = ./.;
+stdenv.mkDerivation (
+  pkg
+  // {
+    name = pkg.pname;
+    src = ./.;
 
-  # buildInputs = [
-  #   pkgs.ffmpeg
-  # ];
-  # # only for the build process
-  # nativeBuildInputs = [
-  #   pkgs.pkgs.config
-  # ];
-  # unpackPhase = '' # shell logic '';
-  buildPhase = ''
-    echo 'hello worllld' > $out
-  '';
-  # installPhase = '' # shell logic '';
-  # ...
-}
+    # buildInputs = [
+    #   pkgs.ffmpeg
+    # ];
+    # # only for the build process
+    # nativeBuildInputs = [
+    #   pkgs.pkgs.config
+    # ];
+    # unpackPhase = '' # shell logic '';
+    buildPhase = ''
+      echo 'hello worllld' > $out
+    '';
+    # installPhase = '' # shell logic '';
+    # ...
+  }
+)
