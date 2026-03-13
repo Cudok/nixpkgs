@@ -23,7 +23,7 @@ let
   nativeOMCompiler = buildPackages.openmodelica.omcompiler;
 in
 
-mkOpenModelicaDerivation
+mkOpenModelicaDerivation (
   {
     pname = "omcompiler";
     omtarget = "omc";
@@ -82,4 +82,9 @@ mkOpenModelicaDerivation
       ];
       platforms = lib.platforms.linux;
     };
-}
+  }
+  # add/merge configuration flage in case of cross compiling
+  // lib.optionalAttrs isCross {
+    configureFlags = [ "--with-omc=${nativeOMCompiler}/bin/omc" ];
+  }
+)
