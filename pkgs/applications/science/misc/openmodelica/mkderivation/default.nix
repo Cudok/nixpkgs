@@ -77,6 +77,17 @@ let
     runHook postConfigure
   '';
 
+  # Targets that we want to build ourselves:
+  deptargets = lib.forEach pkg.omdeps (dep: dep.omtarget);
+
+  # ... so we ask openmodelica makefile to skip those targets.
+  preBuild = ''
+    for target in ${concatStringsSep " " deptargets}; do
+      touch ''${target}.skip;
+    done
+  ''
+  + appendByAttr "preBuild" "\n" pkg;
+
 in
 stdenv.mkDerivation (
   pkg
@@ -88,6 +99,7 @@ stdenv.mkDerivation (
       postPatch
       configureFlags
       configurePhase
+      preBuild
       ;
     # name = pkg.pname;
     # to change the version (source code) of openmodelica adpat src-main.nix
