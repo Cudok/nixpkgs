@@ -5,6 +5,8 @@
   stdenv,
   lib,
   fetchgit,
+  cmake,
+  autoreconfHook,
   symlinkJoin,
 }:
 pkg:
@@ -70,7 +72,19 @@ let
   # Our own configurePhase that accounts for omautoconf
   configurePhase = ''
     runHook preConfigure
+
     # Debug: print
+     echo "=== Checking for configure script ==="
+     if [ -f ./configure ]; then
+       echo "✓ ./configure exists"
+       file ./configure
+     else
+       echo "✗ ./configure NOT found!"
+       echo "Files in current directory:"
+       ls -la
+       exit 1
+     fi
+
     export configureFlags="''${configureFlags} --with-ombuilddir=$PWD/build --prefix=$prefix"
     ./configure --no-recursion $configureFlags
     ${lib.optionalString omautoconf "(cd ${omdir}; ./configure $configureFlags)"}
@@ -82,9 +96,13 @@ let
 
   # ... so we ask openmodelica makefile to skip those targets.
   preBuild = ''
+    echo "Creating skip files for: ${concatStringsSep " " deptargets}"
     for target in ${concatStringsSep " " deptargets}; do
+      echo "  - Creating ''${target}.skip"
       touch ''${target}.skip;
     done
+
+    ls -la *.skip 2>/dev/null || echo "No skip files created"
   ''
   + appendByAttr "preBuild" "\n" pkg;
 
@@ -106,5 +124,9 @@ stdenv.mkDerivation (
     src = fetchgit (import ./src-main.nix);
     version = "1.26.3";
 
+    nativeBuildInputs = getAttrDef "nativeBuildInputs" [ ] pkg ++ [
+      cmake
+      autoreconfHook
+    ];
   }
 )
