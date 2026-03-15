@@ -17,12 +17,10 @@
   binutils,
   mkOpenModelicaDerivation,
 }:
-# pkg:
 let
   isCross = stdenv.buildPlatform != stdenv.hostPlatform;
   nativeOMCompiler = buildPackages.openmodelica.omcompiler;
 in
-
 mkOpenModelicaDerivation (
   {
     pname = "omcompiler";
