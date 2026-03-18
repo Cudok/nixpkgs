@@ -5,6 +5,9 @@
   stdenv,
   lib,
   fetchgit,
+  autoconf,
+  automake,
+  libtool,
   cmake,
   autoreconfHook,
   symlinkJoin,
@@ -125,8 +128,15 @@ stdenv.mkDerivation (
     version = "1.26.3";
 
     nativeBuildInputs = getAttrDef "nativeBuildInputs" [ ] pkg ++ [
+      autoconf
+      automake
+      libtool
       cmake
       autoreconfHook
     ];
+
+    buildInputs = getAttrDef "buildInputs" [ ] pkg ++ lib.optional ifDeps joinedDeps;
+
+    dontUseCmakeConfigure = true;
   }
 )
