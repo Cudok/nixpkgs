@@ -17,6 +17,7 @@
   m4,
   which,
   jdk11,
+  curl,
   ...
 }:
 
@@ -55,6 +56,7 @@ stdenv.mkDerivation rec {
     qt6.qtwebengine  # For OM_OMEDIT_ENABLE_QTWEBENGINE=ON
     boost
     openblas
+    curl
     # Add all other dependencies
   ];
 
