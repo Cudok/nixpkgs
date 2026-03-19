@@ -11,6 +11,12 @@
   boost,
   openblas,
   qt6,
+  autoconf,
+  automake,
+  libtool,
+  m4,
+  which,
+  jdk11,
   ...
 }:
 
@@ -41,6 +47,12 @@ stdenv.mkDerivation rec {
     gfortran
     makeWrapper
     qt6.wrapQtAppsHook
+    autoconf
+    automake
+    libtool
+    m4
+    jdk11
+    which
     # Add other native build tools (flex, bison, etc.)
   ];
 
@@ -67,6 +79,9 @@ stdenv.mkDerivation rec {
     # Disable NVPL search
     "-Dnvpl_DIR=IGNORE"
     "-Dnvpl_ROOT=IGNORE"
+
+    # Disable OpenCL (optional, requires hardware support)
+    "-DOM_OMC_ENABLE_OPENCL=OFF"
   ];
 
  # Add this to set up pkg-config environment
@@ -79,6 +94,14 @@ preConfigure = ''
     export BLAS_LIBRARIES="${openblas}/lib/libopenblas.so"
     export LAPACK_LIBRARIES="${openblas}/lib/libopenblas.so"
 
+  # Verify Java is available
+  echo "=== Java verification ==="
+  java -version
+  javac -version
+  which java
+  which javac
+  echo "=========================="
+'';
 
   meta = {
     description = "OpenModelica";
