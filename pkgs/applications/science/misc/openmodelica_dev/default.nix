@@ -9,8 +9,7 @@
   pkg-config,
   gfortran,
   boost,
-  lapack,
-  blas,
+  openblas,
   qt6,
   ...
 }:
@@ -49,8 +48,7 @@ stdenv.mkDerivation rec {
     qt6.qtbase
     qt6.qtwebengine  # For OM_OMEDIT_ENABLE_QTWEBENGINE=ON
     boost
-    lapack
-    blas
+    openblas
     # Add all other dependencies
   ];
 
@@ -59,13 +57,12 @@ stdenv.mkDerivation rec {
     "-DOM_OMEDIT_ENABLE_QTWEBENGINE=ON"
     "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
     # Add other desired options
- # Tell CMake to use pkg-config for BLAS/LAPACK
+    #
+    # OpenBLAS configuration
+    "-DBLA_VENDOR=OpenBLAS"
+    "-DBLAS_LIBRARIES=${openblas}/lib/libopenblas.so"
+    "-DLAPACK_LIBRARIES=${openblas}/lib/libopenblas.so"
     "-DBLA_PREFER_PKGCONFIG=ON"
-    "-DBLA_VENDOR=Generic"
-
-    # Optional: specify exact package names (CMake 3.25+)
-    "-DBLA_PKGCONFIG_BLAS=blas"
-    "-DBLA_PKGCONFIG_LAPACK=lapack"
 
     # Disable NVPL search
     "-Dnvpl_DIR=IGNORE"
@@ -73,17 +70,15 @@ stdenv.mkDerivation rec {
   ];
 
  # Add this to set up pkg-config environment
-  preConfigure = ''
-    # Set PKG_CONFIG_PATH to find BLAS/LAPACK .pc files
-    export PKG_CONFIG_PATH="${blas}/lib/pkgconfig:${lapack}/lib/pkgconfig:$PKG_CONFIG_PATH"
+# Add this to preConfigure to see what libraries are available
+preConfigure = ''
+  # Set up pkg-config for openblas
+    export PKG_CONFIG_PATH="${openblas}/lib/pkgconfig:$PKG_CONFIG_PATH"
 
-    # Debug: show what pkg-config finds
-    echo "=== pkg-config debug ==="
-    pkg-config --list-all | grep -E 'blas|lapack' || true
-    pkg-config --modversion blas || true
-    pkg-config --modversion lapack || true
-    echo "========================"
-  '';
+    # Set library paths
+    export BLAS_LIBRARIES="${openblas}/lib/libopenblas.so"
+    export LAPACK_LIBRARIES="${openblas}/lib/libopenblas.so"
+
 
   meta = {
     description = "OpenModelica";
