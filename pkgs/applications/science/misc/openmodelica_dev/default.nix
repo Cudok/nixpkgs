@@ -101,11 +101,17 @@ stdenv.mkDerivation rec {
 
     # Disable OpenCL (optional, requires hardware support)
     "-DOM_OMC_ENABLE_OPENCL=OFF"
+
   ];
 
  # Add this to set up pkg-config environment
 # Add this to preConfigure to see what libraries are available
 preConfigure = ''
+
+  # Setup ccache to use a writable directory
+    export CCACHE_DIR="$TMPDIR/ccache"
+    mkdir -p "$CCACHE_DIR"
+
   # Set up environment
     export PKG_CONFIG_PATH="${openblas}/lib/pkgconfig:${curl}/lib/pkgconfig:${zlib}/lib/pkgconfig:$PKG_CONFIG_PATH"
   # Handle bootstrapping sources
