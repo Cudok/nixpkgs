@@ -21,6 +21,7 @@
   zlib,
   libossp_uuid,
   readline,
+  openscenegraph,
   ...
 }:
 
@@ -70,6 +71,8 @@ stdenv.mkDerivation rec {
     libossp_uuid
     qt6.qt5compat
     readline
+    # 3D visualization
+    openscenegraph
     # Add all other dependencies
   ];
 
