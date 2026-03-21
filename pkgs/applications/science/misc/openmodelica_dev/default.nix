@@ -75,7 +75,7 @@ stdenv.mkDerivation rec {
     "-DOM_OMEDIT_ENABLE_QTWEBENGINE=ON"
     "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
     # Add other desired options
-
+    # make find pkg-config
     "-DPKG_CONFIG_EXECUTABLE=${pkg-config}/bin/pkg-config"
     #
     # OpenBLAS configuration
@@ -97,18 +97,18 @@ stdenv.mkDerivation rec {
 preConfigure = ''
   # Set up environment
     export PKG_CONFIG_PATH="${openblas}/lib/pkgconfig:${curl}/lib/pkgconfig:${zlib}/lib/pkgconfig:$PKG_CONFIG_PATH"
-# Handle bootstrapping sources
+  # Handle bootstrapping sources
     mkdir -p OMCompiler/Compiler/boot/bomc
 
-    # Copy and extract the bootstrapping tarball
+  # Copy and extract the bootstrapping tarball
     cp ${ombootstrappingTarball} OMCompiler/Compiler/boot/bomc/sources.tar.gz
 
-    # Extract it (since CMake skips extraction when the file exists)
+  # Extract it (since CMake skips extraction when the file exists)
     cd OMCompiler/Compiler/boot/bomc
     tar xzf sources.tar.gz --strip-components=1
     cd ../../../..
 
-    # Verify the header exists
+  # Verify the header exists
     if [ ! -f OMCompiler/Compiler/boot/bomc/tarball-include/OpenModelicaBootstrappingHeader.h ]; then
       echo "Error: Bootstrapping header not found!"
       find OMCompiler/Compiler/boot/bomc -name "*.h" || true
@@ -116,6 +116,7 @@ preConfigure = ''
     fi
 
     echo "Bootstrapping sources prepared successfully"
+
  # For pkg-config debugging
     echo "=== pkg-config check ==="
     ${pkg-config}/bin/pkg-config --version || echo "pkg-config not found!"
@@ -125,20 +126,20 @@ preConfigure = ''
   # Set up pkg-config for openblas
     export PKG_CONFIG_PATH="${openblas}/lib/pkgconfig:$PKG_CONFIG_PATH"
 
-    # Set library paths
+  # Set library paths
     export BLAS_LIBRARIES="${openblas}/lib/libopenblas.so"
     export LAPACK_LIBRARIES="${openblas}/lib/libopenblas.so"
 
   # Verify Java is available
-  echo "=== Java verification ==="
-  java -version
-  javac -version
-  which java
-  which javac
-  echo "=========================="
+    echo "=== Java verification ==="
+    java -version
+    javac -version
+    which java
+    which javac
+    echo "=========================="
 
   # Create a pkg-config symlink for ossp-uuid
-  export PKG_CONFIG_PATH="${libossp_uuid}/lib/pkgconfig:$PKG_CONFIG_PATH"
+    export PKG_CONFIG_PATH="${libossp_uuid}/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 '';
 
