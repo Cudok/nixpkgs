@@ -19,6 +19,7 @@
   jdk11,
   curl,
   zlib,
+  libossp_uuid,
   ...
 }:
 
@@ -65,6 +66,7 @@ stdenv.mkDerivation rec {
     openblas
     curl
     zlib
+    libossp_uuid
     # Add all other dependencies
   ];
 
@@ -134,6 +136,10 @@ preConfigure = ''
   which java
   which javac
   echo "=========================="
+
+  # Create a pkg-config symlink for ossp-uuid
+  export PKG_CONFIG_PATH="${libossp_uuid}/lib/pkgconfig:$PKG_CONFIG_PATH"
+
 '';
 
   meta = {
