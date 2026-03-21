@@ -1,7 +1,7 @@
 {
   stdenv,
   lib,
-  # fetchgit,
+  fetchurl,
   fetchFromGitHub,
   cmake,
   ccache,
@@ -18,10 +18,17 @@
   which,
   jdk11,
   curl,
+  zlib,
   ...
 }:
 
 let
+  # Pre-fetch the bootstrapping sources
+  # needed because network not availble will configuration phase
+  ombootstrappingTarball = fetchurl {
+    url = "https://github.com/OpenModelica/OMBootstrapping/archive/f53f31420ab8a1877b1a423693599028df698e14.tar.gz";
+    hash = "sha256-/NkCIUcqZZjeUf/IOEEWCa+gmpFdxlpr1wTuVv5QvBU=";
+  };
 in
 stdenv.mkDerivation rec {
   name = "om_dev";
@@ -57,6 +64,7 @@ stdenv.mkDerivation rec {
     boost
     openblas
     curl
+    zlib
     # Add all other dependencies
   ];
 
@@ -65,6 +73,8 @@ stdenv.mkDerivation rec {
     "-DOM_OMEDIT_ENABLE_QTWEBENGINE=ON"
     "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
     # Add other desired options
+
+    "-DPKG_CONFIG_EXECUTABLE=${pkg-config}/bin/pkg-config"
     #
     # OpenBLAS configuration
     "-DBLA_VENDOR=OpenBLAS"
@@ -83,6 +93,33 @@ stdenv.mkDerivation rec {
  # Add this to set up pkg-config environment
 # Add this to preConfigure to see what libraries are available
 preConfigure = ''
+  # Set up environment
+    export PKG_CONFIG_PATH="${openblas}/lib/pkgconfig:${curl}/lib/pkgconfig:${zlib}/lib/pkgconfig:$PKG_CONFIG_PATH"
+# Handle bootstrapping sources
+    mkdir -p OMCompiler/Compiler/boot/bomc
+
+    # Copy and extract the bootstrapping tarball
+    cp ${ombootstrappingTarball} OMCompiler/Compiler/boot/bomc/sources.tar.gz
+
+    # Extract it (since CMake skips extraction when the file exists)
+    cd OMCompiler/Compiler/boot/bomc
+    tar xzf sources.tar.gz --strip-components=1
+    cd ../../../..
+
+    # Verify the header exists
+    if [ ! -f OMCompiler/Compiler/boot/bomc/tarball-include/OpenModelicaBootstrappingHeader.h ]; then
+      echo "Error: Bootstrapping header not found!"
+      find OMCompiler/Compiler/boot/bomc -name "*.h" || true
+      exit 1
+    fi
+
+    echo "Bootstrapping sources prepared successfully"
+ # For pkg-config debugging
+    echo "=== pkg-config check ==="
+    ${pkg-config}/bin/pkg-config --version || echo "pkg-config not found!"
+    echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+
+
   # Set up pkg-config for openblas
     export PKG_CONFIG_PATH="${openblas}/lib/pkgconfig:$PKG_CONFIG_PATH"
 
