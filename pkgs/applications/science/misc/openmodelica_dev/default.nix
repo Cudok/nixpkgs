@@ -22,6 +22,8 @@
   libossp_uuid,
   readline,
   openscenegraph,
+  flex,
+  bison,
   ...
 }:
 
@@ -58,6 +60,8 @@ stdenv.mkDerivation rec {
     m4
     jdk11
     which
+    flex
+    bison
     # Add other native build tools (flex, bison, etc.)
   ];
 
