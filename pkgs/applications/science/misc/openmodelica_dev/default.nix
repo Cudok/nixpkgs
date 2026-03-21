@@ -67,6 +67,7 @@ stdenv.mkDerivation rec {
     curl
     zlib
     libossp_uuid
+    qt6.qt5compat
     # Add all other dependencies
   ];
 
