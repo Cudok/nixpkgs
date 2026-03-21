@@ -158,6 +158,18 @@ preConfigure = ''
   # Create a pkg-config symlink for ossp-uuid
     export PKG_CONFIG_PATH="${libossp_uuid}/lib/pkgconfig:$PKG_CONFIG_PATH"
 
+  # Your existing -isystem transformation
+    export NIX_CFLAGS_COMPILE=$(echo "$NIX_CFLAGS_COMPILE" | sed 's/-isystem /-I/g')
+'';
+
+postInstall = ''
+  # Fix pkg-config files to avoid double slashes
+  find "$out/lib/omc/pkgconfig" -name "*.pc" -type f | while read -r pc; do
+    echo "Fixing $pc"
+    sed -i 's|//|/|g' "$pc"
+    # Also fix any duplicate store path issues
+    sed -i 's|/nix/store/[^/]*/nix/store/|/nix/store/|g' "$pc"
+  done
 '';
 
   meta = {
