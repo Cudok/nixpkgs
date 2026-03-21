@@ -70,6 +70,7 @@ stdenv.mkDerivation rec {
     zlib
     libossp_uuid
     qt6.qt5compat
+    qt6.qttools
     readline
     # 3D visualization
     openscenegraph
