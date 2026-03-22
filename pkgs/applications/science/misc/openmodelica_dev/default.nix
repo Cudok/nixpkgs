@@ -170,6 +170,20 @@ postInstall = ''
     # Also fix any duplicate store path issues
     sed -i 's|/nix/store/[^/]*/nix/store/|/nix/store/|g' "$pc"
   done
+
+ # Wrap binaries (works for both ELF and scripts)
+  LIB_PATH="$out/lib/omc:$out/lib:$out/lib/omc/cpp"
+
+  for prog in $out/bin/*; do
+    if [ -f "$prog" ] && [ -x "$prog" ]; then
+      echo "Wrapping $prog"
+      wrapProgram "$prog" \
+        --set LD_LIBRARY_PATH "$LIB_PATH" \
+        --prefix PATH : "${jdk11}/bin" \
+        --set JAVA_HOME "${jdk11}"
+    fi
+  done
+
 '';
 
   meta = {
