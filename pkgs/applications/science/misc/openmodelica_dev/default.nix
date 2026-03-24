@@ -37,11 +37,11 @@ let
 in
 stdenv.mkDerivation rec {
   name = "om_dev";
-  version = "v1.26.3";
+  version = "1.26.3";
   src = fetchFromGitHub {
       owner = "OpenModelica";
       repo = "OpenModelica";
-      rev = "${version}";
+      rev = "v${version}";
       sha256 = "sha256-GuY8vMF2Hsr4KKtp73/VYqnex9Kwtc2O4KsfIXxOlSY=";
       fetchSubmodules = true;
     };
